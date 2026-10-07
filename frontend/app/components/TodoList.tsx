@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import TodoItem from './TodoItem';
+import TaskDetailModal from './TaskDetailModal';
 import { Todo } from '@/types/todo';
 import { FilterType } from '@/hooks/useTodos';
 
@@ -50,6 +51,7 @@ export default function TodoList({
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   const [quickTaskText, setQuickTaskText] = useState('');
   const [quickAddLoading, setQuickAddLoading] = useState(false);
+  const [selectedDetailTodo, setSelectedDetailTodo] = useState<Todo | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Local fallback states
@@ -473,6 +475,7 @@ export default function TodoList({
               onToggle={onToggleTodo}
               onDelete={onDeleteTodo}
               onEdit={onEditTodo}
+              onOpenDetail={setSelectedDetailTodo}
             />
           ))}
         </ul>
@@ -559,12 +562,13 @@ export default function TodoList({
                           )}
                         </div>
 
-                        <Link
-                          href={`/task/${todo.id}`}
-                          className="font-medium text-blue-600 hover:underline shrink-0"
+                        <button
+                          type="button"
+                          onClick={() => setSelectedDetailTodo(todo)}
+                          className="font-medium text-blue-600 hover:underline shrink-0 cursor-pointer"
                         >
                           Detail
-                        </Link>
+                        </button>
                       </div>
                     </motion.div>
                   );
@@ -655,12 +659,13 @@ export default function TodoList({
                           )}
                         </div>
 
-                        <Link
-                          href={`/task/${todo.id}`}
-                          className="font-medium text-blue-600 hover:underline shrink-0"
+                        <button
+                          type="button"
+                          onClick={() => setSelectedDetailTodo(todo)}
+                          className="font-medium text-blue-600 hover:underline shrink-0 cursor-pointer"
                         >
                           Detail
-                        </Link>
+                        </button>
                       </div>
                     </motion.div>
                   );
@@ -670,6 +675,16 @@ export default function TodoList({
           </div>
         </div>
       )}
+
+      {/* 3. MODAL DETAIL TUGAS INSTAN (0ms) */}
+      <TaskDetailModal
+        isOpen={Boolean(selectedDetailTodo)}
+        onClose={() => setSelectedDetailTodo(null)}
+        todo={selectedDetailTodo}
+        onToggle={onToggleTodo}
+        onDelete={onDeleteTodo}
+        projectName={activeProjectName}
+      />
     </div>
   );
 }

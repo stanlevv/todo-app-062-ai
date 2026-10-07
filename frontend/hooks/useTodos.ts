@@ -83,9 +83,54 @@ export function useTodos(projectId?: number | null) {
     }
   }, [projectId, updateCache]);
 
+  // 2B. Silent Background Sync (Real-time tanpa kedip loading)
+  const fetchTodosSilent = useCallback(async () => {
+    const token = getAuthToken();
+    if (!token) return;
+
+    try {
+      const response = await todoApi.getAll(projectId);
+      if (response.success && Array.isArray(response.data)) {
+        const normalized = response.data.map(normalizeTodo);
+        setTodos((prev) => {
+          // Bandingkan untuk hindari re-render jika tidak ada perubahan dari teman
+          const isSame =
+            prev.length === normalized.length &&
+            prev.every(
+              (item, idx) =>
+                item.id === normalized[idx]?.id &&
+                item.completed === normalized[idx]?.completed &&
+                (item.title || item.task) === (normalized[idx]?.title || normalized[idx]?.task)
+            );
+          if (isSame) return prev;
+          updateCache(normalized);
+          return normalized;
+        });
+      }
+    } catch {
+      // Silent error ignore in background
+    }
+  }, [projectId, updateCache]);
+
   useEffect(() => {
     fetchTodos();
-  }, [fetchTodos]);
+
+    // Auto-polling real-time setiap 5 detik agar perubahan teman langsung terlihat
+    const interval = setInterval(() => {
+      fetchTodosSilent();
+    }, 5000);
+
+    // Sync instan saat pengguna kembali ke tab browser
+    const handleFocus = () => {
+      fetchTodosSilent();
+    };
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [fetchTodos, fetchTodosSilent]);
 
   // 3. Tambah Tugas Baru (Pribadi atau Kelompok)
   const addTodo = async (task: string) => {

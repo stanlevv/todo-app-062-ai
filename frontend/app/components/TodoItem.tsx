@@ -10,11 +10,12 @@ type TodoItemProps = {
   onToggle: (id: number) => void;
   onDelete?: (id: number) => void;
   onEdit?: (id: number, newText: string) => Promise<any>;
+  onOpenDetail?: (todo: Todo) => void;
 };
 
 const SPRING_TRANSITION = { duration: 0.15, ease: 'easeOut' as const };
 
-export default function TodoItem({ todo, onToggle, onDelete, onEdit }: TodoItemProps) {
+export default function TodoItem({ todo, onToggle, onDelete, onEdit, onOpenDetail }: TodoItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.title || todo.task || '');
   const [editLoading, setEditLoading] = useState(false);
@@ -154,16 +155,30 @@ export default function TodoItem({ todo, onToggle, onDelete, onEdit }: TodoItemP
           )}
 
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} transition={SPRING_TRANSITION}>
-            <Link
-              href={`/task/${todo.id}`}
-              title="Lihat Detail Tugas"
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-blue-600 bg-blue-50/80 hover:bg-blue-100 border border-blue-200/60 rounded-lg transition-colors"
-            >
-              <span>Detail</span>
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
+            {onOpenDetail ? (
+              <button
+                type="button"
+                onClick={() => onOpenDetail(todo)}
+                title="Lihat Detail Tugas Instan"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-blue-600 bg-blue-50/80 hover:bg-blue-100 border border-blue-200/60 rounded-lg transition-colors cursor-pointer"
+              >
+                <span>Detail</span>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            ) : (
+              <Link
+                href={`/task/${todo.id}`}
+                title="Lihat Detail Tugas"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-blue-600 bg-blue-50/80 hover:bg-blue-100 border border-blue-200/60 rounded-lg transition-colors"
+              >
+                <span>Detail</span>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            )}
           </motion.div>
 
           {onDelete && (
