@@ -97,18 +97,34 @@ export default function TodoItem({ todo, onToggle, onDelete, onEdit }: TodoItemP
             </div>
           ) : (
             <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
-              <span
-                onClick={() => onToggle(todo.id)}
-                className={`text-xs sm:text-sm font-medium truncate cursor-pointer transition-all select-none ${
-                  todo.completed ? 'line-through text-zinc-400' : 'text-zinc-900'
-                }`}
-              >
-                {todo.title || todo.task}
-              </span>
+              {(() => {
+                const rawText = todo.title || todo.task || '';
+                const match = rawText.match(/^\[([A-Z0-9\/\-]+)\]\s*(.*)$/);
+                const role = match ? match[1] : null;
+                const text = match ? match[2] : rawText;
+
+                return (
+                  <div className="flex items-center gap-2 flex-wrap min-w-0">
+                    {role && (
+                      <span className="font-mono text-[10px] font-medium px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-700 border border-zinc-200/80 shrink-0">
+                        [{role}]
+                      </span>
+                    )}
+                    <span
+                      onClick={() => onToggle(todo.id)}
+                      className={`text-xs sm:text-sm font-medium truncate cursor-pointer transition-all select-none ${
+                        todo.completed ? 'line-through text-zinc-400' : 'text-zinc-900'
+                      }`}
+                    >
+                      {text}
+                    </span>
+                  </div>
+                );
+              })()}
 
               {/* Creator Chip for Team Workspace */}
               {todo.creator_username && (
-                <span className="inline-flex items-center text-[10px] font-medium text-zinc-500 bg-zinc-100/90 border border-zinc-200/70 px-2 py-0.5 rounded-md w-fit">
+                <span className="inline-flex items-center text-[10px] font-medium text-zinc-500 bg-zinc-100 border border-zinc-200/70 px-2 py-0.5 rounded-md w-fit shrink-0">
                   @{todo.creator_username}
                 </span>
               )}
@@ -158,12 +174,11 @@ export default function TodoItem({ todo, onToggle, onDelete, onEdit }: TodoItemP
               type="button"
               onClick={() => onDelete(todo.id)}
               title="Hapus tugas"
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+              className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
-              <span>Hapus</span>
             </motion.button>
           )}
         </div>

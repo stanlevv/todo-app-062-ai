@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "rootDir": "./src",
+    "outDir": "./dist",
     "module": "commonjs",
     "target": "es2016",
     "moduleResolution": "bundler",

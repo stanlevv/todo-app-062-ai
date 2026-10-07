@@ -108,16 +108,16 @@ export default function ProjectModal({
                   setTab('create');
                   setError(null);
                 }}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium rounded-xl transition-all cursor-pointer ${
                   tab === 'create'
-                    ? 'bg-white text-zinc-900 shadow-2xs'
-                    : 'text-zinc-500 hover:text-zinc-800'
+                    ? 'bg-zinc-900 text-white shadow-xs'
+                    : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-200/60'
                 }`}
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                <span>Buat Ruang Baru</span>
+                <span>1. Buat Ruang Baru</span>
               </button>
 
               <button
@@ -126,17 +126,34 @@ export default function ProjectModal({
                   setTab('join');
                   setError(null);
                 }}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium rounded-xl transition-all cursor-pointer ${
                   tab === 'join'
-                    ? 'bg-white text-zinc-900 shadow-2xs'
-                    : 'text-zinc-500 hover:text-zinc-800'
+                    ? 'bg-zinc-900 text-white shadow-xs'
+                    : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-200/60'
                 }`}
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                 </svg>
-                <span>Gabung via Kode</span>
+                <span>2. Gabung via Kode</span>
               </button>
+            </div>
+
+            {/* Mode Explanatory Banner */}
+            <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200/80 text-xs flex items-start gap-2.5">
+              <div className="w-5 h-5 rounded-md bg-zinc-900 text-white flex items-center justify-center text-[10px] shrink-0 mt-0.5">
+                {tab === 'create' ? '+' : '🔑'}
+              </div>
+              <div className="space-y-0.5">
+                <span className="font-semibold text-zinc-900 block text-xs">
+                  {tab === 'create' ? 'Mode Terpilih: Buat Ruang Kelompok Baru' : 'Mode Terpilih: Gabung Ruang Kelompok'}
+                </span>
+                <p className="text-[11px] text-zinc-500 leading-normal">
+                  {tab === 'create'
+                    ? 'Anda akan menjadi pengelola ruang dan otomatis menerima kode undangan unik untuk dibagikan ke tim.'
+                    : 'Gunakan kode undangan (misal: KEL-8942) yang Anda terima dari ketua ruang kelompok.'}
+                </p>
+              </div>
             </div>
 
             {error && (
@@ -149,8 +166,8 @@ export default function ProjectModal({
             {tab === 'create' && (
               <form onSubmit={handleCreate} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-600 uppercase mb-1.5">
-                    Nama Ruang Project Kelompok:
+                  <label className="block text-xs font-medium text-zinc-700 mb-1.5">
+                    Nama Ruang Proyek Kelompok:
                   </label>
                   <input
                     type="text"
@@ -158,14 +175,14 @@ export default function ProjectModal({
                     onChange={(e) => setProjectName(e.target.value)}
                     placeholder="Contoh: Tim Tugas Akhir PWF"
                     required
-                    className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-2xs"
+                    className="w-full px-3.5 py-2.5 bg-white border border-zinc-200 rounded-xl text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all shadow-2xs"
                   />
                   <p className="text-[11px] text-zinc-400 mt-1">
-                    Kode undangan unik (contoh: KEL-8942) akan dibuat secara otomatis.
+                    Kode undangan unik akan dibuat otomatis setelah ruang dibuat.
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2.5 pt-2">
+                <div className="flex items-center gap-2.5 pt-1">
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -182,9 +199,9 @@ export default function ProjectModal({
                     transition={SPRING_TRANSITION}
                     type="submit"
                     disabled={loading || !projectName.trim()}
-                    className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
+                    className="flex-1 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium rounded-xl shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
                   >
-                    {loading ? 'Membuat...' : 'Buat Ruang'}
+                    {loading ? 'Membuat...' : 'Buat Ruang Baru'}
                   </motion.button>
                 </div>
               </form>
@@ -194,8 +211,8 @@ export default function ProjectModal({
             {tab === 'join' && (
               <form onSubmit={handleJoin} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-600 uppercase mb-1.5">
-                    Masukkan Kode Undangan:
+                  <label className="block text-xs font-medium text-zinc-700 mb-1.5">
+                    Masukkan Kode Undangan Ruang:
                   </label>
                   <input
                     type="text"
@@ -203,14 +220,14 @@ export default function ProjectModal({
                     onChange={(e) => setProjectCode(e.target.value.toUpperCase())}
                     placeholder="Contoh: KEL-8942"
                     required
-                    className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs sm:text-sm font-mono tracking-wider text-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-2xs"
+                    className="w-full px-3.5 py-2.5 bg-white border border-zinc-200 rounded-xl text-xs sm:text-sm font-mono tracking-wider text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all shadow-2xs"
                   />
                   <p className="text-[11px] text-zinc-400 mt-1">
-                    Minta kode undangan dari pembuat ruang kelompok Anda.
+                    Pastikan kode undangan sesuai dengan yang dibagikan ketua kelompok Anda.
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2.5 pt-2">
+                <div className="flex items-center gap-2.5 pt-1">
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -227,9 +244,9 @@ export default function ProjectModal({
                     transition={SPRING_TRANSITION}
                     type="submit"
                     disabled={loading || !projectCode.trim()}
-                    className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
+                    className="flex-1 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-medium rounded-xl shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
                   >
-                    {loading ? 'Memproses...' : 'Gabung Sekarang'}
+                    {loading ? 'Memverifikasi...' : 'Gabung Ruang Sekarang'}
                   </motion.button>
                 </div>
               </form>

@@ -80,6 +80,41 @@ export function useProjects() {
     return res;
   }, [fetchProjects]);
 
+  const updateProject = useCallback(async (projectId: number, payload: string | { name?: string; plan_data?: any }) => {
+    const res = await projectApi.update(projectId, payload);
+    if (res.success && res.data) {
+      setActiveProject((prev) => (prev && prev.id === projectId ? { ...prev, ...res.data } : prev));
+      await fetchProjects();
+    }
+    return res;
+  }, [fetchProjects]);
+
+  const removeMember = useCallback(async (projectId: number, userId: number) => {
+    const res = await projectApi.removeMember(projectId, userId);
+    if (res.success) {
+      setMembers((prev) => prev.filter((m) => m.user_id !== userId));
+    }
+    return res;
+  }, []);
+
+  const transferOwnership = useCallback(async (projectId: number, targetUserId: number) => {
+    const res = await projectApi.transferOwnership(projectId, targetUserId);
+    if (res.success && res.data) {
+      if (res.data.project) {
+        setActiveProject(res.data.project);
+      }
+      if (res.data.members) {
+        setMembers(res.data.members);
+      }
+      await fetchProjects();
+    }
+    return res;
+  }, [fetchProjects]);
+
+  const getActivities = useCallback(async (projectId: number) => {
+    return await projectApi.getActivities(projectId);
+  }, []);
+
   useEffect(() => {
     fetchProjects();
   }, [fetchProjects]);
@@ -96,5 +131,9 @@ export function useProjects() {
     joinProject,
     leaveProject,
     deleteProject,
+    updateProject,
+    removeMember,
+    transferOwnership,
+    getActivities,
   };
 }

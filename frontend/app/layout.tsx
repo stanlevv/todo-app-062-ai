@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
@@ -17,9 +17,26 @@ const satoshi = localFont({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  themeColor: "#0284c7",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export const metadata: Metadata = {
-  title: "Todo App 062 — Praktikum PWF T3D",
-  description: "Todo app praktikum PWF, Digitalent Komdigi. Express.js + MySQL + Next.js.",
+  title: "Todo Real — Workspace & AI Planner",
+  description: "Aplikasi manajemen tugas kolaboratif bertenaga AI Planner dan multi-model switching gratis.",
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/icons/icon.svg",
+    apple: "/icons/icon.svg",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Todo Real",
+  },
 };
 
 export default function RootLayout({

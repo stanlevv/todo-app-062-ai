@@ -16,6 +16,11 @@ export const validateRegister = (req: Request, res: Response, next: NextFunction
         return;
     }
 
+    if (payload.password.length < 6) {
+        sendError(res, 'Password minimal 6 karakter!', 400);
+        return;
+    }
+
     next();
 };
 

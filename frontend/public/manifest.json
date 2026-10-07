@@ -1,0 +1,18 @@
+{
+  "name": "Todo Real — Workspace & AI Planner",
+  "short_name": "Todo Real",
+  "description": "Aplikasi manajemen tugas kolaboratif bertenaga AI Planner dan multi-model switching gratis.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0284c7",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

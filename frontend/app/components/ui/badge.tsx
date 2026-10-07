@@ -38,6 +38,7 @@ export const badgeVariants = cva(
         greener: "bg-success-60 text-white",
         dark: "bg-dark-10 text-dark-70",
         gray: "bg-gray-40 text-gray-110",
+        neutral: "bg-zinc-100 text-zinc-800 border border-zinc-200/80 font-medium",
         shadow:
           "bg-white/20 text-[#666A74] shadow-[0px_2px_6px_-1px_#00000005,0px_4px_12px_-2px_#0000000A]",
       },

@@ -1,6 +1,17 @@
 // API Client & Service Layer terintegrasi dengan Backend Express.js & MySQL Laragon
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const resolveApiBaseUrl = (): string => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL.replace(/\/+$/, '');
+  }
+  // Di browser, gunakan reverse proxy /api untuk hilangkan CORS preflight OPTIONS latency
+  if (typeof window !== 'undefined') {
+    return '/api';
+  }
+  return 'http://localhost:5000/api';
+};
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 // 1. Session Storage Helpers
 export const getAuthToken = (): string | null => {
@@ -49,6 +60,15 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      if (typeof window !== 'undefined') {
+        clearAuthSession();
+        const currentPath = window.location.pathname;
+        if (!currentPath.startsWith('/login') && !currentPath.startsWith('/register')) {
+          window.location.href = '/login';
+        }
+      }
+    }
     throw new Error(data.message || 'Terjadi kesalahan pada request.');
   }
 
@@ -181,6 +201,42 @@ export const projectApi = {
       method: 'DELETE',
     });
   },
+
+  update: async (id: number | string, data: string | { name?: string; plan_data?: any }) => {
+    const payload = typeof data === 'string' ? { name: data } : data;
+    return request<{ success: boolean; message: string; data: any }>(`/projects/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  removeMember: async (id: number | string, userId: number | string) => {
+    return request<{ success: boolean; message: string }>(`/projects/${id}/members/${userId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  transferOwnership: async (id: number | string, targetUserId: number) => {
+    return request<{ success: boolean; message: string; data: any }>(`/projects/${id}/transfer-owner`, {
+      method: 'POST',
+      body: JSON.stringify({ targetUserId }),
+    });
+  },
+
+  getActivities: async (id: number | string) => {
+    return request<{
+      success: boolean;
+      data: Array<{
+        id: number;
+        project_id: number;
+        user_id: number | null;
+        action: string;
+        details: string;
+        created_at: string;
+        username?: string | null;
+      }>;
+    }>(`/projects/${id}/activities`);
+  },
 };
 
 // 5. Todo API Endpoints (CRUD MySQL)
@@ -250,3 +306,128 @@ export const todoApi = {
     });
   },
 };
+
+// 6. AI Project & Task Planner API
+export const aiApi = {
+  getModels: async () => {
+    return request<{
+      success: boolean;
+      message: string;
+      data: Array<{
+        id: string;
+        name: string;
+        provider: 'openrouter' | 'gemini';
+        badge: string;
+        description: string;
+        isFree: boolean;
+      }>;
+    }>('/ai/models');
+  },
+
+  grillMeNext: async (payload: {
+    prompt: string;
+    history?: Array<{ question: string; answer: string }>;
+    isSoftware?: boolean;
+    apiKey?: string;
+    model?: string;
+  }) => {
+    return request<{
+      success: boolean;
+      message: string;
+      data: {
+        round: number;
+        aspect: string;
+        question: string;
+        contextHint: string;
+        suggestions: string[];
+      };
+    }>('/ai/grill-me/next', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  generatePlan: async (payload: {
+    prompt: string;
+    projectType?: string;
+    duration?: string;
+    teamSize?: number;
+    isSoftware?: boolean;
+    answers?: Array<{ question: string; answer: string }>;
+    apiKey?: string;
+    model?: string;
+  }) => {
+    return request<{
+      success: boolean;
+      message: string;
+      data: any;
+    }>('/ai/generate-plan', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  applyPlan: async (payload: {
+    projectId?: number | null;
+    projectName?: string;
+    planData: any;
+    selectedTasks?: string[];
+  }) => {
+    return request<{
+      success: boolean;
+      message: string;
+      data: {
+        project: any;
+        projectId: number;
+        tasksCreated: number;
+      };
+    }>('/ai/apply-plan', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  workspaceAsk: async (payload: {
+    projectId: number;
+    message: string;
+    history?: Array<{ role: 'user' | 'model'; content: string }>;
+    apiKey?: string;
+    model?: string;
+  }) => {
+    return request<{
+      success: boolean;
+      message: string;
+      data: {
+        reply: string;
+        executedActions: string[];
+        todos: Array<{
+          id: number;
+          todo: string;
+          completed: boolean;
+          project_id?: number | null;
+          creator_username?: string;
+        }>;
+      };
+    }>('/ai/workspace-ask', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+};
+
+// 8. System & Uptime Monitoring Endpoints
+export const systemApi = {
+  checkHealth: async () => {
+    return request<{
+      success: boolean;
+      message: string;
+      data: {
+        status: string;
+        uptime: number;
+        timestamp: string;
+        environment: string;
+      };
+    }>('/health');
+  },
+};
+

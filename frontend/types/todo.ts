@@ -16,6 +16,7 @@ export interface ProjectData {
   name: string;
   code: string;
   created_by: number;
+  plan_data?: string | any;
   created_at?: string;
   creator_username?: string;
   member_count?: number;
@@ -29,6 +30,69 @@ export interface ProjectMember {
   username: string;
   email: string;
   joined_at: string;
+}
+
+export interface AiTask {
+  id: string;
+  role: string;
+  roleSlug: string;
+  task: string;
+  priority: 'high' | 'medium' | 'low';
+  phase: string;
+  estimatedDays: number;
+}
+
+export interface AiRole {
+  roleName: string;
+  slug: string;
+  title: string;
+  responsibilities: string[];
+  deliverables: string[];
+}
+
+export interface AiErdTable {
+  tableName: string;
+  description: string;
+  columns: Array<{
+    name: string;
+    type: string;
+    key?: string;
+    description?: string;
+  }>;
+}
+
+export interface AiMilestone {
+  phase: string;
+  title: string;
+  duration: string;
+  description: string;
+}
+
+export interface AiProjectPlan {
+  projectName: string;
+  summary: string;
+  targetDuration: string;
+  isSoftware?: boolean;
+  prd: {
+    background: string;
+    problemStatement: string;
+    proposedSolution: string;
+    targetAudience: string[];
+    functionalRequirements: Array<{
+      module: string;
+      features: string[];
+    }>;
+    nonFunctionalRequirements: string[];
+    systemConstraints: string[];
+  };
+  erd: {
+    description: string;
+    mermaid: string;
+    tables: AiErdTable[];
+  } | null;
+  roles: AiRole[];
+  milestones: AiMilestone[];
+  tasks: AiTask[];
 }
 
 export function normalizeTodo(raw: any): Todo {

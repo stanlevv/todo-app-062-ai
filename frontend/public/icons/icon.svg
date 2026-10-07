@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#0284c7" flood-opacity="0.35" />
+    </filter>
+  </defs>
+  <!-- Background Rounded Rect -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+  <!-- Card base inside -->
+  <rect x="76" y="76" width="360" height="360" rx="64" fill="#ffffff" fill-opacity="0.12" stroke="#ffffff" stroke-opacity="0.25" stroke-width="4" filter="url(#shadow)" />
+  <!-- Checkmark SVG path -->
+  <path d="M168 266 L228 326 L344 196" fill="none" stroke="#ffffff" stroke-width="44" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- AI Sparkle in top right corner -->
+  <path d="M370 120 Q370 144 394 144 Q370 144 370 168 Q370 144 346 144 Q370 144 370 120 Z" fill="#38bdf8" />
+</svg>

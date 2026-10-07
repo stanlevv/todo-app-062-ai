@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { todoApi, getAuthToken } from '@/lib/api';
+import { todoApi, getAuthToken, clearAuthSession } from '@/lib/api';
 import { Todo, normalizeTodo } from '@/types/todo';
 
 export type FilterType = 'all' | 'pending' | 'completed';
@@ -66,6 +66,17 @@ export function useTodos(projectId?: number | null) {
         updateCache(normalized);
       }
     } catch (err: any) {
+      if (
+        err.message?.includes('Sesi tidak valid') ||
+        err.message?.includes('Akses ditolak') ||
+        err.message?.includes('Token')
+      ) {
+        clearAuthSession();
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
+        return;
+      }
       setError(err.message || 'Gagal mengambil data tugas dari server.');
     } finally {
       setLoading(false);

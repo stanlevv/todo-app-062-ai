@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  # 1. Database MySQL Kontainer (Gunakan jika tidak memakai TiDB Serverless)
+  mysql:
+    image: mysql:8.0
+    container_name: todo-mysql-prod
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-rootpassword123}
+      MYSQL_DATABASE: ${DB_NAME:-todo_db}
+    volumes:
+      - mysql_prod_data:/var/lib/mysql
+      - ./backend/database.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - todo-network
+
+  # 2. Backend Express.js & Multi-Model AI Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: todo-backend-prod
+    restart: always
+    environment:
+      PORT: 5000
+      NODE_ENV: production
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-rootpassword123}
+      DB_NAME: ${DB_NAME:-todo_db}
+      DB_SSL: ${DB_SSL:-false}
+      JWT_SECRET: ${JWT_SECRET:-production_jwt_secret_pwf_2026}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    ports:
+      - "5000:5000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+        required: false
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    networks:
+      - todo-network
+
+  # 3. Frontend Next.js Single-Domain Edge Proxy & PWA
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: todo-frontend-prod
+    restart: always
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+      INTERNAL_BACKEND_URL: http://backend:5000/api
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - todo-network
+
+volumes:
+  mysql_prod_data:
+
+networks:
+  todo-network:
+    driver: bridge

@@ -89,5 +89,16 @@ export const TodoModel = {
 
         const [result]: any = await pool.query(query, params);
         return result.affectedRows;
+    },
+
+    // 8. Batch tambah beberapa tugas sekaligus (misal dari AI Plan)
+    createMany: async (userId: number, tasks: string[], projectId: number | null = null) => {
+        if (!tasks || tasks.length === 0) return 0;
+        const values = tasks.map((t) => [userId, projectId, t, 0]);
+        const [result]: any = await pool.query(
+            'INSERT INTO todos (user_id, project_id, task, is_completed) VALUES ?',
+            [values]
+        );
+        return result.affectedRows;
     }
 };
