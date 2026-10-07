@@ -2,8 +2,8 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "module": "commonjs",
-    "target": "es2016",
+    "module": "ESNext",
+    "target": "ES2022",
     "moduleResolution": "bundler",
     "verbatimModuleSyntax": false,
     "strict": true,
